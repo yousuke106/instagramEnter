@@ -7,13 +7,30 @@ function handleKeyDown(event) {
     const isCommentField = event.target.matches('textarea[aria-label*="コメント"], textarea[aria-label*="Comment"], [contenteditable="true"][role="textbox"]');
 
     if (isCommentField) {
-      // If Ctrl+Enter is pressed, allow submission
+      // If Ctrl+Enter is pressed, find and click the submit button
       if (event.ctrlKey || event.metaKey) {
-        // Allow default behavior (submit)
+        event.preventDefault();
+        event.stopPropagation();
+        event.stopImmediatePropagation();
+
+        // Find the form containing the textarea
+        const form = event.target.closest('form');
+        if (form) {
+          // Look for the submit button with "投稿する" or "Post" text
+          const buttons = form.querySelectorAll('[role="button"]');
+          for (const button of buttons) {
+            const text = button.textContent?.trim();
+            if (text === '投稿する' || text === 'Post') {
+              button.click();
+              return;
+            }
+          }
+        }
         return;
       }
 
-      // If only Enter is pressed (without Ctrl), prevent submission
+      // If only Enter is pressed (without Ctrl), prevent submission and insert line break
+      event.preventDefault();
       event.stopPropagation();
       event.stopImmediatePropagation();
 
@@ -34,8 +51,6 @@ function handleKeyDown(event) {
         // For contenteditable elements
         document.execCommand('insertLineBreak');
       }
-
-      event.preventDefault();
     }
   }
 }

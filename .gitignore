@@ -13,13 +13,18 @@ Thumbs.db
 dist/
 build/
 
-# Dependencies (if you add npm/yarn later)
+# Dependencies
 node_modules/
+package-lock.json
 
 # Packaged extension
 *.zip
 *.crx
 *.pem
+dist/
+
+# Build scripts (not needed for distribution)
+generate-icons.js
 
 # Logs
 *.log

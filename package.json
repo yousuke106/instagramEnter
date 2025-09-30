@@ -1,0 +1,17 @@
+{
+  "name": "instagram-ctrl-enter-submit",
+  "version": "1.0.0",
+  "description": "Submit Instagram comments with Ctrl+Enter instead of Enter",
+  "scripts": {
+    "build": "node scripts/build.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yousuke106/instagramEnter.git"
+  },
+  "author": "yousuke106",
+  "license": "MIT",
+  "devDependencies": {
+    "archiver": "^7.0.1"
+  }
+}
