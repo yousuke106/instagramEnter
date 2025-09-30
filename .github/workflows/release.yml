@@ -29,14 +29,10 @@ jobs:
         id: package-version
         run: echo "version=$(node -p "require('./package.json').version")" >> $GITHUB_OUTPUT
 
-      - name: Create Release
-        id: create_release
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Create Release and Upload Asset
+        uses: softprops/action-gh-release@v1
         with:
-          tag_name: ${{ github.ref_name }}
-          release_name: Release ${{ github.ref_name }}
+          name: Release ${{ github.ref_name }}
           body: |
             ## Instagram Ctrl+Enter Submit ${{ github.ref_name }}
 
@@ -53,18 +49,15 @@ jobs:
 
             - **Enterキー**: 改行を挿入
             - **Ctrl+Enter** (MacはCmd+Enter): コメントを送信
+
+            ### 変更履歴
+
+            詳細は[コミット履歴](https://github.com/${{ github.repository }}/commits/${{ github.ref_name }})を参照してください。
+          files: |
+            dist/*.zip
           draft: false
           prerelease: false
-
-      - name: Upload Release Asset
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./dist/instagram-ctrl-enter-submit-v${{ steps.package-version.outputs.version }}.zip
-          asset_name: instagram-ctrl-enter-submit-v${{ steps.package-version.outputs.version }}.zip
-          asset_content_type: application/zip
+          generate_release_notes: true
 
       - name: Upload build artifact
         uses: actions/upload-artifact@v4
