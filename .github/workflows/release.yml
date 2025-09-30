@@ -1,0 +1,74 @@
+name: Build and Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build extension
+        run: npm run build
+
+      - name: Get version from package.json
+        id: package-version
+        run: echo "version=$(node -p "require('./package.json').version")" >> $GITHUB_OUTPUT
+
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref_name }}
+          release_name: Release ${{ github.ref_name }}
+          body: |
+            ## Instagram Ctrl+Enter Submit ${{ github.ref_name }}
+
+            ### インストール方法
+
+            1. 下記のZIPファイルをダウンロード
+            2. ZIPファイルを解凍
+            3. Chromeで `chrome://extensions/` を開く
+            4. 右上の「デベロッパーモード」を有効化
+            5. 「パッケージ化されていない拡張機能を読み込む」をクリック
+            6. 解凍したフォルダを選択
+
+            ### 機能
+
+            - **Enterキー**: 改行を挿入
+            - **Ctrl+Enter** (MacはCmd+Enter): コメントを送信
+          draft: false
+          prerelease: false
+
+      - name: Upload Release Asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./dist/instagram-ctrl-enter-submit-v${{ steps.package-version.outputs.version }}.zip
+          asset_name: instagram-ctrl-enter-submit-v${{ steps.package-version.outputs.version }}.zip
+          asset_content_type: application/zip
+
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: extension-package
+          path: dist/*.zip
+          retention-days: 90
